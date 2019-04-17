@@ -1,0 +1,178 @@
+@keyframes example {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+body{
+	background-color:white;
+	background-image:url(background.png);
+	background-repeat: repeat;
+}
+
+
+iframe{
+	width:40%;
+	height:50%;
+	position:absolute;
+	left:0%;
+	top:25%;
+	border:none;
+	outline:none;
+	/*opacity:0;
+  animation-name: example;
+  animation-duration: 20s;
+  animation-fill-mode: forwards;*/
+}
+
+#Texte1 {
+  /*opacity:0;
+  animation-name: example;
+  animation-duration: 5s;
+  animation-fill-mode: forwards;*/
+  margin:3%;
+  font-size : 20px;
+}
+
+#Texte2 {
+  /*opacity:0;
+  animation-name: example;
+  animation-duration: 5s;
+  animation-delay:4s;
+  animation-fill-mode: forwards;*/
+  margin:3%;
+  font-size : 20px;
+}
+
+#Texte3 {
+  /*opacity:0;
+  animation-name: example;
+  animation-duration: 5s;
+  animation-delay:8s;
+  animation-fill-mode: forwards;*/
+  margin:3%;
+  font-size : 20px;
+}
+
+#Texte4 {
+  /*opacity:0;
+  animation-name: example;
+  animation-duration: 5s;
+  animation-delay:14s;
+  animation-fill-mode: forwards;*/
+  font-size : 20px;
+  margin:3%;
+}
+
+#Texte5 {
+  /*opacity:0;
+  animation-name: example;
+  animation-duration: 5s;
+  animation-delay:18s;
+  animation-fill-mode: forwards;*/
+  font-size : 20px;
+  margin:3%;
+}
+
+#Titre { 
+	width:40%;
+	height:10%;
+	position:absolute;
+	left:2.5%;
+	top:5%;
+	border:none;
+	outline:none;
+	font-family:Timeless;
+	font-size:40px;
+	text-transform: uppercase;
+	text-align:center;
+	color:rgba(255, 208, 73, 1);
+}
+
+#ContainerTexte { 
+	width:55%;
+	height:100%;
+	position:absolute;
+	right:0%;
+	top:0%;
+	background:rgba(258, 258, 258, 0.5);
+	border:none;
+	outline:none;
+	font-family:Timeless;
+}
+
+#ContainerTexte2 { 
+	width:100%;
+	height:100%;
+	position:absolute;
+	top:13%;
+	border:none;
+	outline:none;
+	text-align:center;
+}
+
+#next {
+	right:5%;
+	bottom:5%;
+	width:10%;
+	display:block;
+	position:absolute;
+}
+
+#txtNext {
+	width:100%;
+	text-align:center;
+	bottom:5%;
+	display:block;
+	position:absolute;
+	color:rgba(139, 54, 8, 1);
+	font-family:Timeless;
+}
+
+#prev {
+	left:5%;
+	top:5%;
+	width:10%;
+	display:block;
+	position:absolute;
+}
+
+#txtPrev {
+	width:100%;
+	text-align:center;
+	top:5%;
+	display:block;
+	position:absolute;
+	color:rgba(139, 54, 8, 1);
+	font-family:Timeless;
+}
+
+#home {
+	left:2%;
+	bottom:2%;
+	width:5%;
+	display:block;
+	position:absolute;
+}
+
+#annales{
+	/*opacity:0;
+  animation-name: example;
+  animation-duration: 5s;
+  animation-fill-mode: forwards;*/
+	left:13%;
+	bottom:12%;
+	height:55%;
+	display:block;
+	position:absolute;
+}
+
+#legend {
+	width:30%;
+	text-align:center;
+	bottom:5%;
+	left:7.5%;
+	display:block;
+	position:absolute;
+	font-family:Timeless;
+	color:rgba(255, 208, 73, 1);
+}

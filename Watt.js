@@ -1,0 +1,280 @@
+"use strict";
+
+
+main();
+
+function main() {
+const sceneThreeJs = {
+        sceneGraph: null,
+        camera: null,
+        renderer: null,
+        controls: null
+    };
+
+	const pickingData = {
+        descente:false,
+		remontee:false,
+		enabled: true,		// Mode picking en cours ou désactivé (CTRL enfoncé)
+        enableDragAndDrop: false, // Drag and drop en cours ou désactivé
+        selectableObjects: [],    // Les objets selectionnables par picking
+        selectedObject: null,     // L'objet actuellement selectionné
+        selectedPlane: {p:null,n:null}, // Le plan de la caméra au moment de la selection. Plan donné par une position p, et une normale n.
+    };
+	
+    initEmptyScene(sceneThreeJs);
+    init3DObjects(sceneThreeJs.sceneGraph,pickingData);
+
+   // *************************** //
+    // Creation d'un lanceur de rayon (ray caster) de Three.js pour le calcul de l'intersection entre un objet et un rayon
+    // *************************** //
+    const raycaster = new THREE.Raycaster();
+
+    // *************************** //
+    // Fonction de rappels
+    // *************************** //
+
+    // Récupération de la taille de la fenetre en tant que variable à part
+    const screenSize = {
+        w:sceneThreeJs.renderer.domElement.clientWidth,
+        h:sceneThreeJs.renderer.domElement.clientHeight
+    };
+
+// Fonction à appeler lors du clic de la souris: selection d'un objet
+    //  (Création d'un wrapper pour y passer les paramètres souhaités)
+    const wrapperMouseDown = function(event) { onMouseDown(event,raycaster,pickingData,screenSize,sceneThreeJs.camera); };
+    document.addEventListener( 'mousedown', wrapperMouseDown );
+
+    const wrapperMouseUp = function(event) { onMouseUp(event,pickingData); };
+    document.addEventListener( 'mouseup', wrapperMouseUp );
+
+    // Fonction à appeler lors du déplacement de la souris: translation de l'objet selectionné
+    const wrapperMouseMove = function(event) { onMouseMove(event, pickingData, screenSize, sceneThreeJs.camera,sceneThreeJs.sceneGraph) };
+    document.addEventListener( 'mousemove', wrapperMouseMove );
+	
+    animationLoop(sceneThreeJs);
+}
+
+// Initialise les objets composant la scène 3D
+function init3DObjects(sceneGraph,pickingData) {
+	
+	const a = 4*2.1;
+	const b = 4*2.2;
+	const c = 4*0.6;
+	
+	
+	
+	/*
+	const curve = new THREE.CatmullRomCurve3(
+		createCurve(a,b,c)
+	);
+
+	const points = curve.getPoints( 100 );
+	const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+	const material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+	
+	const curveObject = new THREE.Line( geometry, material );
+	sceneGraph.add(curveObject);
+	*/
+	
+	/*
+	
+	//Create circle
+    const materialCircle1 = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    const geometryCircle1 = new THREE.CircleGeometry( b, 64 );
+	geometryCircle1.vertices.shift();
+	const circle1 = new THREE.LineLoop( geometryCircle1, materialCircle1 ) ;
+	circle1.position.set(a,0,0);
+	sceneGraph.add( circle1);
+	
+	const materialCircle2 = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    const geometryCircle2 = new THREE.CircleGeometry( b, 64 );
+	geometryCircle2.vertices.shift();
+	const circle2 = new THREE.LineLoop( geometryCircle2, materialCircle2 ) ;
+	circle2.position.set(-a,0,0);
+	sceneGraph.add( circle2);*/
+
+	const A = createCylinder("A",Vector3(-a,0,0));
+	const M = createCylinder("M",Vector3(0,0,0));
+	const P = createCylinder("P",Vector3(3,0,0));
+	const Q = createCylinder("Q",Vector3(-3,0,0));
+	const B = createCylinder("B",Vector3(a,0,0));
+	
+	pickingData.selectableObjects.push(P);
+
+	
+	sceneGraph.add(A);
+	sceneGraph.add(M);
+	sceneGraph.add(P);
+	sceneGraph.add(Q);
+	sceneGraph.add(B);
+	
+	
+	const theta = 0.1;
+	
+	P.position.set(coordP(theta,a,b,c)[0],coordP(theta,a,b,c)[1],coordP(theta,a,b,c)[2]);
+	Q.position.set(coordQ(theta,a,b,c)[0],coordQ(theta,a,b,c)[1],coordQ(theta,a,b,c)[2]);
+	M.position.set(coordM(theta,a,b,c)[0],coordM(theta,a,b,c)[1],coordM(theta,a,b,c)[2]);
+	
+	
+	const AP = createBar(b, "AP");
+	const BQ = createBar(b, "BQ");
+	const PQ = createBar(2*c, "PQ");
+	
+	sceneGraph.add(AP);
+	sceneGraph.add(BQ);
+	sceneGraph.add(PQ);
+	
+	
+	const coorda = [-a,0,0];
+	const coordb=[a,0,0];
+	const coordm = coordM(theta,a,b,c);
+	const coordp = coordP(theta,a,b,c);
+	const coordq = coordQ(theta,a,b,c);
+
+	barBetween(coorda,coordp,AP);
+	barBetween(coordb,coordq,BQ);
+	barBetween(coordp,coordq,PQ);
+	
+	let pts1=[];
+	const l1 = 0.15*2;
+	const l2 = 0.3*2;
+	const l3 = 0.1*2;
+	const l4 = 0.3*2;
+    pts1.push(new THREE.Vector2(0,l1));
+	pts1.push(new THREE.Vector2(l2,l1));
+	pts1.push(new THREE.Vector2(l2,l1+l3));
+	pts1.push(new THREE.Vector2(l2+l4,0));
+	pts1.push(new THREE.Vector2(l2,-l1-l3));
+	pts1.push(new THREE.Vector2(l2,-l1));
+	pts1.push(new THREE.Vector2(0,-l1));
+	pts1.push(new THREE.Vector2(0,l1));
+    const shape1 = new THREE.Shape( pts1 );
+	
+    let Points1 = [];
+	Points1.push( new THREE.Vector3(0,0,-0.15));
+	Points1.push( new THREE.Vector3(0,0,0.15));
+    const Spline1 =  new THREE.CatmullRomCurve3( Points1 );
+
+    const extrudeSettings1 = {
+	steps: 150,
+	bevelEnabled: false,
+	extrudePath: Spline1
+};
+
+    const extrudeGeometry1 = new THREE.ExtrudeBufferGeometry( shape1, extrudeSettings1 );
+    const flecheG = new THREE.Mesh( extrudeGeometry1,new THREE.MeshLambertMaterial({color:0xc40712})) ;
+    flecheG.material.side = THREE.DoubleSide; 
+	flecheG.name = "flecheG";
+	flecheG.position.set(0,0.4,-3.0);
+	flecheG.rotateZ(Math.PI/2);
+	flecheG.rotateX(3*Math.PI/2);
+	flecheG.rotateY(Math.PI/2);
+	P.add(flecheG);
+
+}
+
+// Demande le rendu de la scène 3D
+function render( sceneThreeJs ) {
+    sceneThreeJs.renderer.render(sceneThreeJs.sceneGraph, sceneThreeJs.camera);
+}
+
+function animate(sceneThreeJs, time) {
+
+    const t = time/1000;//time in second
+	/*
+	const a = 4*2.1;
+	const b = 4*2.2;
+	const c = 4*0.6;
+	
+	const theta = (thetaMin(a,b,c)+thetaMax(a,b,c))/2 + Math.cos(t)*(thetaMax(a,b,c)-thetaMin(a,b,c))/2;
+	
+	const M = sceneThreeJs.sceneGraph.getObjectByName("M");
+	const Q = sceneThreeJs.sceneGraph.getObjectByName("Q");
+	const P = sceneThreeJs.sceneGraph.getObjectByName("P");
+	
+	const AP = sceneThreeJs.sceneGraph.getObjectByName("AP");
+	const BQ = sceneThreeJs.sceneGraph.getObjectByName("BQ");
+	const PQ = sceneThreeJs.sceneGraph.getObjectByName("PQ");
+	
+	P.position.set(coordP(theta,a,b,c)[0],coordP(theta,a,b,c)[1],coordP(theta,a,b,c)[2]);
+	Q.position.set(coordQ(theta,a,b,c)[0],coordQ(theta,a,b,c)[1],coordQ(theta,a,b,c)[2]);
+	M.position.set(coordM(theta,a,b,c)[0],coordM(theta,a,b,c)[1],coordM(theta,a,b,c)[2]);
+	
+	const coorda = [-a,0,0];
+	const coordb =[a,0,0];
+	const coordm = coordM(theta,a,b,c);
+	const coordp = coordP(theta,a,b,c);
+	const coordq = coordQ(theta,a,b,c);
+
+	barBetween(coorda,coordp,AP);
+	barBetween(coordb,coordq,BQ);
+	barBetween(coordp,coordq,PQ);*/
+	
+    render(sceneThreeJs);
+}
+
+
+
+
+
+
+// Fonction d'initialisation d'une scène 3D sans objets 3D
+//  Création d'un graphe de scène et ajout d'une caméra et d'une lumière.
+//  Création d'un moteur de rendu et ajout dans le document HTML
+function initEmptyScene(sceneThreeJs) {
+
+    sceneThreeJs.sceneGraph = new THREE.Scene( );
+
+    sceneThreeJs.camera = sceneInit.createCamera(0,0,26);
+	sceneThreeJs.camera.lookAt(0,0,0);
+    sceneInit.insertAmbientLight(sceneThreeJs.sceneGraph);
+    sceneInit.insertLight(sceneThreeJs.sceneGraph,Vector3(0,5,20));
+	sceneInit.insertLight(sceneThreeJs.sceneGraph,Vector3(0,-5,20));
+
+    sceneThreeJs.renderer = sceneInit.createRenderer();
+    sceneInit.insertRenderInHtml(sceneThreeJs.renderer.domElement);
+
+
+    const onResizeFunction = function(event) { onResize(sceneThreeJs); };
+    window.addEventListener('resize', onResizeFunction );
+}
+
+// Fonction de gestion d'animation
+function animationLoop(sceneThreeJs) {
+
+    // Fonction JavaScript de demande d'image courante à afficher
+    requestAnimationFrame(
+
+        // La fonction (dite de callback) recoit en paramètre le temps courant
+        function(timeStamp){
+            animate(sceneThreeJs,timeStamp); // appel de notre fonction d'animation
+            animationLoop(sceneThreeJs); // relance une nouvelle demande de mise à jour
+        }
+
+     );
+
+}
+
+// Fonction appelée lors du redimensionnement de la fenetre
+function onResize(sceneThreeJs) {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    sceneThreeJs.camera.aspect = width / height;
+    sceneThreeJs.camera.updateProjectionMatrix();
+
+    sceneThreeJs.renderer.setSize(width, height);
+}
+
+function Vector3(x,y,z) {
+    return new THREE.Vector3(x,y,z);
+}
+
+function MaterialRGB(r,g,b) {
+    const c = new THREE.Color(r,g,b);
+    return new THREE.MeshLambertMaterial( {color:c} );
+}
+
+

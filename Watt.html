@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title> Essai </title>
+		<link rel="stylesheet" href="styleWatt.css">	<script src="three.min.js" defer></script>
+		<script src="utileWatt.js" defer></script>
+		<script src="sceneInit.js" defer></script>
+		<script src="interactionWatt.js" defer></script>
+		<script src="Watt.js" defer></script>
+
+		
+
+	</head>
+
+	<body>
+		
+	
+		<div id="AffichageScene3D">
+		</div>
+		
+	</body>
+
+</html>
